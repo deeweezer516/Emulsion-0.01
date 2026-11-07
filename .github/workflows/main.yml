@@ -62,25 +62,24 @@ jobs:
             -print -quit)
 
           if [ -z "$SETTINGS_FILE" ]; then
-            echo "ERROR: Gradle project not found in archive"
+            echo "ERROR: Gradle project not found"
             exit 1
           fi
 
           PROJECT_DIR=$(dirname "$SETTINGS_FILE")
-
-          if [ ! -f "$PROJECT_DIR/gradlew" ]; then
-            echo "ERROR: Gradle wrapper not found"
-            exit 1
-          fi
-
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           echo "Found project: $PROJECT_DIR"
+          
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Build Emulsion APK
         run: |
           cd "$PROJECT_DIR"
-          chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug
+          gradle --no-daemon assembleDebug
+          
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
